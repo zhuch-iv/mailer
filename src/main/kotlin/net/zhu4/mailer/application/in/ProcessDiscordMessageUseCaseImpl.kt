@@ -2,6 +2,7 @@ package net.zhu4.mailer.application.`in`
 
 import discord4j.core.`object`.entity.Attachment
 import discord4j.core.`object`.entity.Message
+import net.zhu4.mailer.application.out.UserPersistencePort
 import net.zhu4.mailer.domain.Character
 import net.zhu4.mailer.domain.MailList
 import org.springframework.stereotype.Service
@@ -11,14 +12,19 @@ import reactor.core.publisher.Mono
 @Service
 class ProcessDiscordMessageUseCaseImpl(
     private val textFileMessageUseCase: GetCharactersFromTextFileMessageUseCase,
-    private val formMailListsUseCase: FormMailListsUseCase
+    private val formMailListsUseCase: FormMailListsUseCase,
+    private val userPersistencePort: UserPersistencePort
 ) : ProcessDiscordMessageUseCase {
 
     override fun processMessage(message: Message): Mono<Void> {
-        if (hasTextAttachment(message.attachments)) {
-            return textFileMessageUseCase.getCharacters(message)
-                .formMailLists()
-                .replyToUser(message)
+        if (hasTextAttachment(message.attachments) && message.author.isPresent) {
+            return userPersistencePort.findByDiscordId(message.author.get().id.asLong())
+                .filter { it.allowed }
+                .flatMap {
+                    textFileMessageUseCase.getCharacters(message)
+                        .formMailLists()
+                        .replyToUser(message)
+                }
                 .onErrorResume { message.reply(it.message) }
         }
         return Mono.empty()
