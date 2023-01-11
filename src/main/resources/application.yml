@@ -1,0 +1,13 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/mailer?retryWrites=false
+      database: mailer
+
+esi:
+  baseUrl: https://esi.evetech.net/latest/
+
+mailer:
+  discord:
+    token: ${DISCORD_TOKEN}
+  ceoName: Skriwel
