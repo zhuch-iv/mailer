@@ -1,8 +1,8 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/mailer?retryWrites=false
-      database: mailer
+      uri: ${MONGODB_URI}
+      database: ${MONGODB_DATABASE}
 
 esi:
   baseUrl: https://esi.evetech.net/latest/
