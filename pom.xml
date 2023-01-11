@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>net.zhu4</groupId>
 	<artifactId>mailer</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<name>mailer</name>
 	<description>Eve online mailer helper</description>
 	<properties>
@@ -86,7 +86,22 @@
 	<build>
 		<sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
 		<testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+		<!--suppress UnresolvedMavenProperty -->
+		<finalName>${project.name}-v${project.version}-${git.commit.id.abbrev}</finalName>
 		<plugins>
+			<plugin>
+				<groupId>io.github.git-commit-id</groupId>
+				<artifactId>git-commit-id-maven-plugin</artifactId>
+				<version>5.0.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>revision</goal>
+						</goals>
+						<phase>initialize</phase>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
