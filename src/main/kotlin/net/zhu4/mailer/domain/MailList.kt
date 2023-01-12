@@ -17,8 +17,9 @@ data class MailList(
                 .chunked(MAIL_LIST_MAX_CAPACITY - 1)
                 .map {
                     MailList(
-                        it.map { ch -> "<a href=showinfo:1385//${ch.id}>${ch.name}</a>" }
-                            .joinToString(separator = ",\n")
+                        it.joinToString(separator = ",\n") {
+                            ch -> "<a href=showinfo:1385//${ch.id}>${ch.name}</a>"
+                        }
                             + ",\n<a href=showinfo:1385//${ceoId}>${ceoName}</a>"
                     )
                 }
