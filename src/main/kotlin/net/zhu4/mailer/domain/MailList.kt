@@ -19,7 +19,7 @@ data class MailList(
                     MailList(
                         it.map { ch -> "<a href=showinfo:1385//${ch.id}>${ch.name}</a>" }
                             .joinToString(separator = ", ")
-                            + "<a href=showinfo:1385//${ceoId}>${ceoName}</a>"
+                            + ", <a href=showinfo:1385//${ceoId}>${ceoName}</a>"
                     )
                 }
         }
