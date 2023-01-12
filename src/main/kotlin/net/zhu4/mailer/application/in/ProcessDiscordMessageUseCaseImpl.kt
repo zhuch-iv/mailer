@@ -5,6 +5,7 @@ import discord4j.core.`object`.entity.Message
 import net.zhu4.mailer.application.out.UserPersistencePort
 import net.zhu4.mailer.domain.Character
 import net.zhu4.mailer.domain.MailList
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -25,7 +26,10 @@ class ProcessDiscordMessageUseCaseImpl(
                         .formMailLists()
                         .replyToUser(message)
                 }
-                .onErrorResume { message.reply(it.message) }
+                .onErrorResume {
+                    log.error("An error occurred while processing the message", it)
+                    message.reply(it.message)
+                }
         }
         return Mono.empty()
     }
@@ -65,5 +69,6 @@ class ProcessDiscordMessageUseCaseImpl(
     companion object {
         private const val expectedFileName = "message.txt"
         private const val expectedContentType = "text/plain; charset=utf-8"
+        private val log = LoggerFactory.getLogger(ProcessDiscordMessageUseCaseImpl::class.java)
     }
 }

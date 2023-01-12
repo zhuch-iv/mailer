@@ -19,7 +19,9 @@ class GetCharactersFromTextFileMessageUseCaseImpl(
 
     override fun getCharacters(message: Message): Mono<List<Character>> {
         return message.getTextFile()
-            .flatMap { esiPort.getCharacterIdsByNames(it.splitNames()) }
+            .flatMapMany { Flux.fromIterable(it.splitNames().chunked(500)) }
+            .flatMap { esiPort.getCharacterIdsByNames(it) }
+            .collectList()
             .filterNonMailedCharacters()
             .flatMapMany { Flux.fromIterable(it) }
             .flatMap { esiPort.getCharacter(it) }
@@ -40,12 +42,13 @@ class GetCharactersFromTextFileMessageUseCaseImpl(
             .filter { it.isNotEmpty() }
     }
 
-    private fun Mono<List<Int>>.filterNonMailedCharacters(): Mono<List<Int>> {
+    private fun Mono<List<List<Int>>>.filterNonMailedCharacters(): Mono<List<Int>> {
         return this.flatMap {
-            characterPort.findByIds(it)
+            val ids = it.flatten()
+            characterPort.findByIds(ids)
                 .map { list ->
                     val mailed = list.associateBy { ch -> ch.id }
-                    it.filter { id -> !mailed.containsKey(id) }
+                    ids.filter { id -> !mailed.containsKey(id) }
                 }
         }
     }

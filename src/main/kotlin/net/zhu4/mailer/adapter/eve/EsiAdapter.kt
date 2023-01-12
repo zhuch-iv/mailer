@@ -27,7 +27,7 @@ class EsiAdapter(
             .bodyToMono(Characters::class.java)
             .map {
                 log.debug("Get from esi: $it")
-                it.characters.map { ch -> ch.id }
+                it.characters?.map { ch -> ch.id } ?: emptyList()
             }
 
     }

@@ -1,7 +1,7 @@
 package net.zhu4.mailer.adapter.eve
 
 data class Characters(
-    val characters: List<CharacterToId>
+    val characters: List<CharacterToId>?
 )
 
 data class CharacterToId(

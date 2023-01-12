@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>net.zhu4</groupId>
 	<artifactId>mailer</artifactId>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<name>mailer</name>
 	<description>Eve online mailer helper</description>
 	<properties>
