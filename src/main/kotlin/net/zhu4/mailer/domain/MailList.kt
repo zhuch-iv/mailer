@@ -12,10 +12,16 @@ data class MailList(
                 .map { MailList(it.joinToString(separator = ", ")) }
         }
 
-        fun List<Character>.fromCharactersAppendCeoName(ceoName: String): List<MailList> {
-            return this.map(Character::name)
+        fun List<Character>.fromCharactersAppendCeoName(ceoId: Int, ceoName: String): List<MailList> {
+            return this
                 .chunked(MAIL_LIST_MAX_CAPACITY - 1)
-                .map { MailList((it + ceoName).joinToString(separator = ", ")) }
+                .map {
+                    MailList(
+                        it.map { ch -> "<a href=showinfo:1385//${ch.id}>${ch.name}</a>" }
+                            .joinToString(separator = ", ")
+                            + "<a href=showinfo:1385//${ceoId}>${ceoName}</a>"
+                    )
+                }
         }
 
         private const val MAIL_LIST_MAX_CAPACITY: Int = 50

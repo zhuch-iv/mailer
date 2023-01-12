@@ -18,11 +18,14 @@ class FormMailListsUseCaseImpl(
     @Value("\${mailer.ceoName}")
     private lateinit var ceoName: String
 
+    @Value("\${mailer.ceoId}")
+    private lateinit var ceoId: String
+
     override fun formMailLists(characters: Mono<List<Character>>): Mono<List<MailList>> {
         return characters
             .filterAllowedCorporationCharacters()
             .saveCharacters()
-            .map { it.fromCharactersAppendCeoName(ceoName) }
+            .map { it.fromCharactersAppendCeoName(ceoId.toInt(), ceoName) }
     }
 
     private fun Mono<List<Character>>.filterAllowedCorporationCharacters(): Mono<List<Character>> {
