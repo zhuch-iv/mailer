@@ -2,6 +2,7 @@ package net.zhu4.mailer.application.`in`
 
 import discord4j.core.`object`.entity.Attachment
 import discord4j.core.`object`.entity.Message
+import discord4j.core.spec.MessageCreateSpec
 import net.zhu4.mailer.application.out.UserPersistencePort
 import net.zhu4.mailer.domain.Character
 import net.zhu4.mailer.domain.MailList
@@ -49,7 +50,13 @@ class ProcessDiscordMessageUseCaseImpl(
         return this.flatMap {
             if (it.isNotEmpty()) {
                 Flux.fromIterable(it)
-                    .flatMap { mail -> message.reply(mail.characterNames) }
+                    .flatMap { mail ->
+                        if (mail.characterNames.length >= 2000) {
+                            message.replyAsFile(outputFileName, mail.characterNames)
+                        } else {
+                            message.reply("```${mail.characterNames}```")
+                        }
+                    }
                     .then()
             } else {
                 message.reply("No new eligible characters")
@@ -61,12 +68,29 @@ class ProcessDiscordMessageUseCaseImpl(
         if (msg == null) {
             return Mono.empty()
         }
+        MessageCreateSpec.builder()
+            .addFile("mail_list.txt", msg.byteInputStream())
+            .build()
         return this.channel
             .flatMap { it.createMessage(msg) }
             .then()
     }
 
+    private fun Message.replyAsFile(fileName: String, msg: String?): Mono<Void> {
+        if (msg == null) {
+            return Mono.empty()
+        }
+        return this.channel
+            .flatMap { it.createMessage(
+                MessageCreateSpec.builder()
+                    .addFile(fileName, msg.byteInputStream())
+                    .build()
+            ) }
+            .then()
+    }
+
     companion object {
+        private const val outputFileName = "mail_list.txt"
         private const val expectedFileName = "message.txt"
         private const val expectedContentType = "text/plain; charset=utf-8"
         private val log = LoggerFactory.getLogger(ProcessDiscordMessageUseCaseImpl::class.java)
