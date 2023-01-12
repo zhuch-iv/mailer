@@ -51,11 +51,7 @@ class ProcessDiscordMessageUseCaseImpl(
             if (it.isNotEmpty()) {
                 Flux.fromIterable(it)
                     .flatMap { mail ->
-                        if (mail.characterNames.length >= 2000) {
-                            message.replyAsFile(outputFileName, mail.characterNames)
-                        } else {
-                            message.reply("```${mail.characterNames}```")
-                        }
+                        message.replyAsFile(outputFileName, mail.characterNames)
                     }
                     .then()
             } else {
