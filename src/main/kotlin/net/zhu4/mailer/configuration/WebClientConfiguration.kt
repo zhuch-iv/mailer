@@ -19,14 +19,24 @@ class WebClientConfiguration {
     }
 
     @Bean("esiWebClient")
-    fun esiWebClient(@Value("\${esi.baseUrl}") baseUrl: String): WebClient {
+    fun esiWebClient(@Value("\${eve.baseUrl}") baseUrl: String): WebClient {
         return WebClient.builder()
-                .baseUrl("https://esi.evetech.net/latest/")
+                .baseUrl(baseUrl)
                 .defaultHeader(HttpHeaders.ACCEPT_LANGUAGE, "en")
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.CACHE_CONTROL, "no-cache")
                 .defaultUriVariables(mapOf("datasource" to "tranquility"))
                 .build()
+    }
+
+    @Bean("eveOauthWebClient")
+    fun eveOauthWebClient(@Value("\${eve.loginUrl}") loginUrl: String): WebClient {
+        return WebClient.builder()
+            .baseUrl(loginUrl)
+            .defaultHeader(HttpHeaders.ACCEPT_LANGUAGE, "en")
+            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+            .defaultHeader(HttpHeaders.CACHE_CONTROL, "no-cache")
+            .build()
     }
 }

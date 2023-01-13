@@ -19,3 +19,8 @@ data class Character(
         const val COLLECTION_NAME = "characters"
     }
 }
+
+data class EveAuthorization(
+    val accessToken: String,
+    val refreshToken: String,
+)

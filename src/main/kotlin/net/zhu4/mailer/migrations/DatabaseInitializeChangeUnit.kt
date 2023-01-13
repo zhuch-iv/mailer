@@ -9,7 +9,6 @@ import io.mongock.driver.mongodb.reactive.util.MongoSubscriberSync
 import io.mongock.driver.mongodb.reactive.util.SubscriberSync
 import net.zhu4.mailer.domain.Character
 import net.zhu4.mailer.domain.Corporation
-import net.zhu4.mailer.domain.EveAuthorization
 import net.zhu4.mailer.domain.User
 import org.bson.types.ObjectId
 
@@ -31,7 +30,7 @@ class DatabaseInitializeChangeUnit {
         subscriber.await()
         mongoDatabase.createCollection(Corporation.COLLECTION_NAME).subscribe(subscriber)
         subscriber.await()
-        mongoDatabase.createCollection(EveAuthorization.COLLECTION_NAME).subscribe(subscriber)
+        mongoDatabase.createCollection("auth").subscribe(subscriber)
         subscriber.await()
     }
 
@@ -44,7 +43,7 @@ class DatabaseInitializeChangeUnit {
         subscriber.await()
         mongoDatabase.getCollection(Corporation.COLLECTION_NAME).drop().subscribe(subscriber)
         subscriber.await()
-        mongoDatabase.getCollection(EveAuthorization.COLLECTION_NAME).drop().subscribe(subscriber)
+        mongoDatabase.getCollection("auth").drop().subscribe(subscriber)
         subscriber.await()
     }
 

@@ -14,7 +14,7 @@ class DiscordConfiguration {
 
     @Bean
     fun <T : Event> gatewayDiscordClient(
-        @Value("\${mailer.discord.token}") token: String,
+        @Value("\${discord.token}") token: String,
         eventListeners: List<DiscordEventListener<T>>
     ): GatewayDiscordClient {
         val client = DiscordClientBuilder.create(token)

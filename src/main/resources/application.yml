@@ -1,4 +1,6 @@
 spring:
+  thymeleaf:
+    prefix: file:src/main/resources/templates/
   data:
     mongodb:
       uri: ${MONGODB_URI}
@@ -7,11 +9,21 @@ spring:
 esi:
   baseUrl: https://esi.evetech.net/latest/
 
+eve:
+  baseUrl: https://esi.evetech.net/latest/
+  loginUrl: https://login.eveonline.com/
+  clientId: ${EVE_CLIENT_ID}
+  secretKey: ${EVE_SECRET_KEY}
+  issuer: login.eveonline.com
+  audience: EVE Online
+
+discord:
+  token: ${DISCORD_TOKEN}
+  applicationId: ${DISCORD_APPLICATION_ID}
+
 mailer:
-  discord:
-    token: ${DISCORD_TOKEN}
-  ceoName: Skriwel
-  ceoId: 2116434445
+  ceoName: ${CEO_NAME:Skriwel}
+  ceoId: ${CEO_ID:2116434445}
 
 server:
   port: ${SERVER_PORT:8080}
