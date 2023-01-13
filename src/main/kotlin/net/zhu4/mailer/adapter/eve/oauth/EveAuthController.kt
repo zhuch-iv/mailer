@@ -4,7 +4,6 @@ import net.zhu4.mailer.application.`in`.AuthorizeInEveUseCase
 import net.zhu4.mailer.application.`in`.EveAuthorizeRequest
 import org.bson.types.ObjectId
 import org.slf4j.LoggerFactory
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -16,7 +15,7 @@ class EveAuthController(
     private val authorizeInEveUseCase: AuthorizeInEveUseCase
 ) {
 
-    @GetMapping(value = ["/eve/callback"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @GetMapping(value = ["/eve/callback"])
     fun handleEveCallback(
         @RequestParam code: String,
         @RequestParam state: String

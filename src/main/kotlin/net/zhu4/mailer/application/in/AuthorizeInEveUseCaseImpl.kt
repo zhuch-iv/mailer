@@ -61,8 +61,8 @@ class AuthorizeInEveUseCaseImpl(
     private fun User.replyToUser(message: String, interactionId: String): Mono<User> {
         val interaction = this.interactions[interactionId]
         return gatewayDiscordClient.getMessageById(
-            Snowflake.of(interaction!!.messageId!!),
-            Snowflake.of(interaction.channelId!!)
+            Snowflake.of(interaction!!.channelId!!),
+            Snowflake.of(interaction.messageId!!)
         )
             .flatMap { it.edit(MessageEditSpec.builder().contentOrNull(message).build()) }
             .map { _ -> this }
