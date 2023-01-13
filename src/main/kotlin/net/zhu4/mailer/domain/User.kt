@@ -16,6 +16,11 @@ data class User(
     val interactions: MutableMap<String, Interaction> = mutableMapOf()
 ) {
 
+    fun clearInteraction(interactionId: String): User {
+        this.interactions.remove(interactionId)
+        return this
+    }
+
     fun createInteraction(): Interaction {
         val new = Interaction()
         this.interactions[new.getKey()] = new

@@ -2,7 +2,6 @@ package net.zhu4.mailer.application.`in`
 
 import discord4j.common.util.Snowflake
 import discord4j.core.GatewayDiscordClient
-import discord4j.core.spec.MessageEditSpec
 import net.zhu4.mailer.application.out.EsiPort
 import net.zhu4.mailer.application.out.EveOauthPort
 import net.zhu4.mailer.application.out.UserPersistencePort
@@ -22,12 +21,14 @@ class AuthorizeInEveUseCaseImpl(
 ) : AuthorizeInEveUseCase {
 
     override fun authorizeInEve(request: EveAuthorizeRequest): Mono<Void> {
+        // TODO: Refactor integrations, create index
         return userPersistencePort.findByInteractionId(request.id)
             .getAuthToken(request.code)
             .verifyAccessToken()
             .flatMap { userPersistencePort.save(it) }
             .replyToUserSuccess(request.id.toHexString())
             .replyToUserFail(request.id)
+            .flatMap { userPersistencePort.save(it.clearInteraction(request.id.toHexString())) }
             .then()
     }
 
@@ -60,11 +61,8 @@ class AuthorizeInEveUseCaseImpl(
 
     private fun User.replyToUser(message: String, interactionId: String): Mono<User> {
         val interaction = this.interactions[interactionId]
-        return gatewayDiscordClient.getMessageById(
-            Snowflake.of(interaction!!.channelId!!),
-            Snowflake.of(interaction.messageId!!)
-        )
-            .flatMap { it.edit(MessageEditSpec.builder().contentOrNull(message).build()) }
+        return gatewayDiscordClient.getChannelById(Snowflake.of(interaction!!.channelId!!))
+            .flatMap { it.restChannel.createMessage(message) }
             .map { _ -> this }
     }
 
