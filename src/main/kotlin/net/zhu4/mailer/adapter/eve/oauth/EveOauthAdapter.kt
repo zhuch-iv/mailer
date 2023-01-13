@@ -50,7 +50,7 @@ class EveOauthAdapter(
 
     override fun createRedirectLink(state: String): String {
         return "https://login.eveonline.com/v2/oauth/authorize/" +
-            "?response_type=code&redirect_uri=https%3A%2F%2Fmailer.zhu4.net%2Feve%2Fredirect" +
+            "?response_type=code&redirect_uri=https%3A%2F%2Fmailer.zhu4.net%2Feve%2Fcallback" +
             "&client_id=$clientId&scope=esi-mail.send_mail.v1" +
             "&state=$state"
     }
