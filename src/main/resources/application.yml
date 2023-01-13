@@ -1,6 +1,4 @@
 spring:
-  thymeleaf:
-    prefix: file:src/main/resources/templates/
   data:
     mongodb:
       uri: ${MONGODB_URI}
