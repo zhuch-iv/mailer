@@ -20,9 +20,10 @@ class HandleAuthEventUseCaseImpl(
             .then(userPersistencePort.findByDiscordId(event.interaction.user.id.asLong()))
             .createInteraction(event)
             .switchIfEmpty(Mono.error(UserNotFountException("Sorry, this command is not available for you.")))
-            .doOnError {
+            .onErrorResume {
                 log.error("An error occurred while processing the message", it)
                 event.editReply("${it.message}")
+                    .then()
             }
             .then()
     }
