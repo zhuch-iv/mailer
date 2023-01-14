@@ -10,7 +10,6 @@ import org.bson.types.ObjectId
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.switchIfEmpty
 
 @Service
 class AuthorizeInEveUseCaseImpl(
@@ -51,12 +50,11 @@ class AuthorizeInEveUseCaseImpl(
 
     private fun Mono<User>.replyToUserFail(interactionId: ObjectId): Mono<User> {
         return this
-            .switchIfEmpty { userPersistencePort.findByInteractionId(interactionId) }
             .onErrorResume {
                 log.error("An error occurred while processing the message", it)
-                userPersistencePort.findById(interactionId)
+                userPersistencePort.findByInteractionId(interactionId)
+                    .flatMap { user ->  user.replyToUser("Something goes wrong.", interactionId.toHexString()) }
             }
-            .flatMap { it.replyToUser("Something goes wrong.", interactionId.toHexString()) }
     }
 
     private fun User.replyToUser(message: String, interactionId: String): Mono<User> {
