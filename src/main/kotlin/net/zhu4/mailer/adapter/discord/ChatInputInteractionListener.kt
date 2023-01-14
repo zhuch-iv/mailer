@@ -34,7 +34,6 @@ class ChatInputInteractionListener(
         return event.editReply("Sorry, there is no such command.").then()
     }
 
-
     companion object {
         private val log = LoggerFactory.getLogger(ChatInputInteractionListener::class.java)
     }
