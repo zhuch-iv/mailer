@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono
 class HandleGreetingEventUseCaseImpl: HandleGreetingEventUseCase {
     override fun greeting(event: ChatInputInteractionEvent): Mono<Void> {
         log.info("Event: ${event.getOption("template")} ${event.getOption("file")} $event")
-        return event.createFollowup("OK!")
+        return event.editReply("OK!")
             .then()
     }
 

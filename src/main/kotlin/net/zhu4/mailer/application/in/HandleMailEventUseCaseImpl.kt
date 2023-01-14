@@ -8,6 +8,7 @@ import reactor.core.publisher.Mono
 class HandleMailEventUseCaseImpl: HandleMailEventUseCase {
 
     override fun mail(event: ChatInputInteractionEvent): Mono<Void> {
-        TODO("Not yet implemented")
+        return event.editReply("Not yet implemented")
+            .then()
     }
 }
