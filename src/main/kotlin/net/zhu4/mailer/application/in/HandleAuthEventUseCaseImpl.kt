@@ -17,10 +17,13 @@ class HandleAuthEventUseCaseImpl(
 
     override fun authorize(event: ChatInputInteractionEvent): Mono<Void> {
         return event.deferReply().withEphemeral(true)
-            .then(userPersistencePort.findByDiscordId(event.interaction.user.id.asLong()))
+            .then(
+                userPersistencePort.findByDiscordId(event.interaction.user.id.asLong())
+                    .switchIfEmpty(Mono.error(UserNotFountException("Sorry, this command is not available for you.")))
+            )
             .createInteraction(event)
-            .switchIfEmpty(Mono.error(UserNotFountException("Sorry, this command is not available for you.")))
             .onErrorResume {
+                // TODO: проверить обработку ошибок во всех стримах
                 log.error("An error occurred while processing the message", it)
                 event.editReply("${it.message}")
                     .then()
