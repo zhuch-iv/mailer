@@ -17,14 +17,23 @@ class ChatInputInteractionListener(
     }
 
     override fun execute(event: ChatInputInteractionEvent): Mono<Void> {
-        return (commands[event.commandName]?.handle(event)
-                ?: event.reply("Sorry, there is no such command."))
+        return event.deferReply()
+            .then(handleEvent(event))
             .onErrorResume {
                 log.error("An error occurred while processing the message", it)
                 event.editReply("${it.message}")
                     .then()
             }
     }
+
+    private fun handleEvent(event: ChatInputInteractionEvent): Mono<Void> {
+        return commands[event.commandName]?.handle(event) ?: replyNotFound(event)
+    }
+
+    private fun replyNotFound(event: ChatInputInteractionEvent): Mono<Void> {
+        return event.editReply("Sorry, there is no such command.").then()
+    }
+
 
     companion object {
         private val log = LoggerFactory.getLogger(ChatInputInteractionListener::class.java)
