@@ -23,7 +23,6 @@ class HandleAuthEventUseCaseImpl(
             )
             .createInteraction(event)
             .onErrorResume {
-                // TODO: проверить обработку ошибок во всех стримах
                 log.error("An error occurred while processing the message", it)
                 event.editReply("${it.message}")
                     .then()
