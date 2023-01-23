@@ -48,7 +48,7 @@ class HandleMailEventUseCaseImpl(
                             SendMailRequest(
                                 from = user.character!!.id,
                                 token = it,
-                                mail = createMail(tuple.t1.template, tuple.t2.template, recipients)
+                                mail = createMail(tuple.t2.template, tuple.t1.template, recipients)
                             )
                         }
                 }
