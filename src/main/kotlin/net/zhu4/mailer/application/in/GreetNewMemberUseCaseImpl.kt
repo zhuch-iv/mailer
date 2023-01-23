@@ -46,8 +46,8 @@ class GreetNewMemberUseCaseImpl(
     }
 
     companion object {
-        private const val channelId = 775665634658091042L
-        private const val recruitmentId = 1067191406692675595L
+        private const val channelId = 946083077740957707L
+        private const val recruitmentId = 880050661398556722L
         private const val templateName = "greeting"
     }
 }

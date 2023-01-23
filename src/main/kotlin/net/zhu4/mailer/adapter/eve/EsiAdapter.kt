@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatusCode
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
@@ -51,6 +52,7 @@ class EsiAdapter(
         return webClient.post()
             .uri("/characters/${request.from}/mail/")
             .header(HttpHeaders.AUTHORIZATION, "Bearer ${request.token}")
+            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .bodyValue(request.mail.fromDomain())
             .retrieve()
             .onStatus(HttpStatusCode::is4xxClientError, this::wrapClientError)

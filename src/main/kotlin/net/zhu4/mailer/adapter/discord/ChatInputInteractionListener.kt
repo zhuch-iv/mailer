@@ -22,7 +22,7 @@ class ChatInputInteractionListener(
             .then(handleEvent(event))
             .onErrorResume {
                 log.error("An error occurred while processing the message", it)
-                event.editReply("${it.message}")
+                event.editReply("${it.message?.substring(0, 1000)}")
                     .then()
             }
     }
