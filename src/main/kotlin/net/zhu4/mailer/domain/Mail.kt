@@ -1,7 +1,7 @@
 package net.zhu4.mailer.domain
 
 class Mail(
-    val approvedCost: Long,
+    val approvedCost: Long = 1_000_000,
     val body: String,
     val recipients: List<Recipient>,
     val subject: String

@@ -8,4 +8,6 @@ class EveOauth2ServerException(msg: String, cause: Throwable? = null): RuntimeEx
 
 class EveOauth2ClientException(msg: String, cause: Throwable? = null): RuntimeException(msg, cause)
 
-class UserNotFountException(msg: String, cause: Throwable? = null): RuntimeException(msg, cause)
+class UserNotFoundException(msg: String, cause: Throwable? = null): RuntimeException(msg, cause)
+
+class UserNotAuthorizedException(msg: String, cause: Throwable? = null): RuntimeException(msg, cause)

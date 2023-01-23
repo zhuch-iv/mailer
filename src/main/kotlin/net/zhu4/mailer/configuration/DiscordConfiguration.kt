@@ -3,6 +3,7 @@ package net.zhu4.mailer.configuration
 import discord4j.core.DiscordClientBuilder
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.event.domain.Event
+import discord4j.gateway.intent.IntentSet
 import discord4j.rest.RestClient
 import net.zhu4.mailer.adapter.discord.DiscordEventListener
 import org.springframework.beans.factory.annotation.Value
@@ -19,6 +20,8 @@ class DiscordConfiguration {
     ): GatewayDiscordClient {
         val client = DiscordClientBuilder.create(token)
                 .build()
+                .gateway()
+                .setEnabledIntents(IntentSet.all())
                 .login()
                 .block()!!
         for (listener in eventListeners) {

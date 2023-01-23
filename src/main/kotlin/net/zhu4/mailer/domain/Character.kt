@@ -15,6 +15,14 @@ data class Character(
     val securityStatus: Float?,
     val isMailed: Boolean = false
 ) {
+
+    fun toMailRecipient(): Recipient {
+        return Recipient(
+            recipientId = id,
+            recipientType = RecipientType.CHARACTER
+        )
+    }
+
     companion object {
         const val COLLECTION_NAME = "characters"
     }

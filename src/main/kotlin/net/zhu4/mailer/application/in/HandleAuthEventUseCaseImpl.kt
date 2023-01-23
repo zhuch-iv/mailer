@@ -1,7 +1,7 @@
 package net.zhu4.mailer.application.`in`
 
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import net.zhu4.mailer.application.UserNotFountException
+import net.zhu4.mailer.application.UserNotFoundException
 import net.zhu4.mailer.application.out.EveOauthPort
 import net.zhu4.mailer.application.out.UserPersistencePort
 import net.zhu4.mailer.domain.User
@@ -16,10 +16,11 @@ class HandleAuthEventUseCaseImpl(
 
     override fun authorize(event: ChatInputInteractionEvent): Mono<Void> {
         return userPersistencePort.findByDiscordId(event.interaction.user.id.asLong())
-            .switchIfEmpty(Mono.error(UserNotFountException("Sorry, this command is not available for you.")))
+            .switchIfEmpty(Mono.error(UserNotFoundException("Sorry, this command is not available for you.")))
             .createInteraction(event)
             .then()
     }
+
     private fun Mono<User>.createInteraction(event: ChatInputInteractionEvent): Mono<Void> {
         return this.flatMap { user ->
             val interaction = user.createInteraction()

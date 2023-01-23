@@ -16,7 +16,7 @@ class MessageCreateListener(
     }
 
     override fun execute(event: MessageCreateEvent): Mono<Void> {
-        log.debug("Get event: $event")
+        log.debug("Received event: $event")
         return useCase.processMessage(event.message)
     }
 

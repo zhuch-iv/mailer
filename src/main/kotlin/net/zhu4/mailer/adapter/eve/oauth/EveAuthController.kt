@@ -22,11 +22,19 @@ class EveAuthController(
     ): Mono<Rendering> {
         log.debug("Request on callback handler - code: $code, state: $state")
         return authorizeInEveUseCase.authorizeInEve(EveAuthorizeRequest(code, ObjectId(state)))
-            .then(Mono.just(Rendering.view("ok").build()))
+            .then(rendering("OK!"))
             .onErrorResume {
                 log.error("Error while handle eve callback", it)
-                Mono.just(Rendering.view("not_ok").build())
+                rendering("NOT OK!")
             }
+    }
+
+    private fun rendering(message: String): Mono<Rendering> {
+        return Mono.just(
+            Rendering.view("message")
+                .model(mapOf("message" to message))
+                .build()
+        )
     }
 
     companion object {

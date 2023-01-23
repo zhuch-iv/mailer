@@ -18,6 +18,7 @@ class ChatInputInteractionListener(
 
     override fun execute(event: ChatInputInteractionEvent): Mono<Void> {
         return event.deferReply()
+            .withEphemeral(true)
             .then(handleEvent(event))
             .onErrorResume {
                 log.error("An error occurred while processing the message", it)

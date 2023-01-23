@@ -9,7 +9,9 @@ interface EveOauthPort {
 
     fun getEveAuthorization(authorizationCode: String): Mono<EveAuthorization>
 
-    fun verifyAccessToken(token: String): Mono<Int>
+    fun verifyOrRefreshAccessToken(auth: EveAuthorization): Mono<EveAuthorization>
 
-    fun verifyRefreshToken(token: String): Mono<Int>
+    fun verifyAccessToken(auth: EveAuthorization): Mono<Int>
+
+    fun verifyRefreshToken(auth: EveAuthorization): Mono<Int>
 }

@@ -7,6 +7,7 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import net.zhu4.mailer.adapter.eve.EsiAdapter
 import net.zhu4.mailer.application.EveOauth2ClientException
 import net.zhu4.mailer.application.EveOauth2ServerException
+import net.zhu4.mailer.application.UserNotAuthorizedException
 import net.zhu4.mailer.application.out.EveOauthPort
 import net.zhu4.mailer.domain.EveAuthorization
 import org.jose4j.jwa.AlgorithmConstraints.ConstraintType
@@ -72,11 +73,21 @@ class EveOauthAdapter(
             .map { EveAuthorization(it.accessToken, it.refreshToken) }
     }
 
-    override fun verifyAccessToken(token: String): Mono<Int> {
+    override fun verifyOrRefreshAccessToken(auth: EveAuthorization): Mono<EveAuthorization> {
+        return verifyAccessToken(auth)
+            .map { auth }
+            .switchIfEmpty {
+                verifyRefreshToken(auth)
+                    .flatMap { refreshEveAuthorization(auth.refreshToken) }
+            }
+            .switchIfEmpty(Mono.error(UserNotAuthorizedException("There are no valid tokens")))
+    }
+
+    override fun verifyAccessToken(auth: EveAuthorization): Mono<Int> {
         return jwtConsumer()
             .map {
                 try {
-                    it.processToClaims(token).subject.parseSubjectId()
+                    it.processToClaims(auth.accessToken).subject.parseSubjectId()
                 } catch (e: InvalidJwtException) {
                     log.error("Invalid access token:", e)
                     0
@@ -85,17 +96,34 @@ class EveOauthAdapter(
             .filter { it != 0 }
     }
 
-    override fun verifyRefreshToken(token: String): Mono<Int> {
+    override fun verifyRefreshToken(auth: EveAuthorization): Mono<Int> {
         return jwtConsumer()
             .map {
                 try {
-                    it.processToClaims(token).subject.parseSubjectId()
+                    it.processToClaims(auth.refreshToken).subject.parseSubjectId()
                 } catch (e: InvalidJwtException) {
                     log.error("Invalid refresh token:", e)
                     0
                 }
             }
             .filter { it != 0 }
+    }
+
+    private fun refreshEveAuthorization(refreshToken: String): Mono<EveAuthorization> {
+        val formData = LinkedMultiValueMap<String, String>()
+        formData.add("grant_type", "refresh_token")
+        formData.add("refresh_token", refreshToken)
+        val encoded = Base64.getEncoder().encodeToString("$clientId:$secretKey".toByteArray())
+        return webClient.post()
+            .uri("/v2/oauth/token")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .header(HttpHeaders.HOST, "login.eveonline.com")
+            .header(HttpHeaders.AUTHORIZATION, "Basic $encoded")
+            .retrieve()
+            .onStatus(HttpStatusCode::is4xxClientError, this::wrapClientError)
+            .onStatus(HttpStatusCode::is5xxServerError, this::wrapServerError)
+            .bodyToMono(TokenResponse::class.java)
+            .map { EveAuthorization(it.accessToken, it.refreshToken) }
     }
 
     private fun String.parseSubjectId(): Int {

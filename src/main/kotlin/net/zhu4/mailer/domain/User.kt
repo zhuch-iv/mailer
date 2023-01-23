@@ -17,7 +17,7 @@ data class User(
 ) {
 
     fun clearInteraction(interactionId: String): User {
-        this.interactions.remove(interactionId)
+        this.interactions.clear()
         return this
     }
 
@@ -28,8 +28,7 @@ data class User(
     }
 
     fun appendMessage(key: String, messageId: Long, channelId: Long): User {
-        val new = interactions[key]!!.copy(messageId = messageId, channelId = channelId)
-        this.interactions[key] = new
+        this.interactions[key] = interactions[key]!!.copy(messageId = messageId, channelId = channelId)
         return this
     }
 

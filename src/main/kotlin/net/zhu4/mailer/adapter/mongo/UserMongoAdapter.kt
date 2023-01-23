@@ -39,5 +39,6 @@ class UserMongoAdapter(
             ),
             User::class.java
         )
+            .log(UserMongoAdapter::class.qualifiedName, Level.FINEST)
     }
 }

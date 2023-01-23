@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono
 
 @Service
 class ProcessDiscordMessageUseCaseImpl(
-    private val textFileMessageUseCase: GetCharactersFromTextFileMessageUseCase,
+    private val textFileMessageUseCase: GetCharactersFromAttachmentsUseCase,
     private val formMailListsUseCase: FormMailListsUseCase,
     private val userPersistencePort: UserPersistencePort
 ) : ProcessDiscordMessageUseCase {
@@ -23,7 +23,7 @@ class ProcessDiscordMessageUseCaseImpl(
             return userPersistencePort.findByDiscordId(message.author.get().id.asLong())
                 .filter { it.allowed }
                 .flatMap {
-                    textFileMessageUseCase.getCharacters(message)
+                    textFileMessageUseCase.getCharacters(message.attachments)
                         .formMailLists()
                         .replyToUser(message)
                 }

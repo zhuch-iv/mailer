@@ -78,6 +78,7 @@ class DatabaseInitializeChangeUnit {
                     User(ObjectId(), 303617557628452864L, true),
                     User(ObjectId(), 884393061814247464L, true),
                     User(ObjectId(), 227070627968843776L, true),
+                    User(ObjectId(), 414061635590946826, true)
                 )
             )
             .subscribe(subscriber)

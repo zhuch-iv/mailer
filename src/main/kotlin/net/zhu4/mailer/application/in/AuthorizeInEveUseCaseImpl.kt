@@ -20,7 +20,6 @@ class AuthorizeInEveUseCaseImpl(
 ) : AuthorizeInEveUseCase {
 
     override fun authorizeInEve(request: EveAuthorizeRequest): Mono<Void> {
-        // TODO: Refactor integrations, create index
         return userPersistencePort.findByInteractionId(request.id)
             .getAuthToken(request.code)
             .verifyAccessToken()
@@ -39,7 +38,7 @@ class AuthorizeInEveUseCaseImpl(
 
     private fun Mono<User>.verifyAccessToken(): Mono<User> {
         return this.flatMap { user ->
-            eveOauthPort.verifyAccessToken(user.authorization!!.accessToken)
+            eveOauthPort.verifyAccessToken(user.authorization!!)
                 .flatMap { esiPort.getCharacter(it).map { character -> user.copy(character = character) } }
         }
     }

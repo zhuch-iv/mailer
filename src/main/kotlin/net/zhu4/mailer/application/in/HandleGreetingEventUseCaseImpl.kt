@@ -6,7 +6,8 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 
 @Service
-class HandleGreetingEventUseCaseImpl: HandleGreetingEventUseCase {
+class HandleGreetingEventUseCaseImpl(): HandleGreetingEventUseCase {
+
     override fun greeting(event: ChatInputInteractionEvent): Mono<Void> {
         log.info("Event: ${event.getOption("template")} ${event.getOption("file")} $event")
         return event.editReply("OK!")
@@ -14,6 +15,7 @@ class HandleGreetingEventUseCaseImpl: HandleGreetingEventUseCase {
     }
 
     companion object {
+        private const val templateName = "greeting"
         private val log = LoggerFactory.getLogger(HandleGreetingEventUseCaseImpl::class.java)
     }
 }
