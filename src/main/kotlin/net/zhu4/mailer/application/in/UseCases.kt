@@ -28,7 +28,7 @@ interface FormMailListsUseCase {
 
 interface FormRecipientsListUseCase {
 
-    fun formRecipientsList(characters: Mono<List<Character>>): Mono<List<Recipient>>
+    fun formRecipientsList(characters: Mono<List<Character>>): Mono<List<List<Recipient>>>
 }
 
 interface AuthorizeInEveUseCase {

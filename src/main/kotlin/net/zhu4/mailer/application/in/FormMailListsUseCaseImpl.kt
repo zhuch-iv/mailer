@@ -9,6 +9,7 @@ import net.zhu4.mailer.domain.Recipient
 import net.zhu4.mailer.domain.RecipientType
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Service
@@ -28,9 +29,11 @@ class FormMailListsUseCaseImpl(
             .map { it.fromCharactersAppendCeoName(ceoId.toInt(), ceoName) }
     }
 
-    override fun formRecipientsList(characters: Mono<List<Character>>): Mono<List<Recipient>> {
+    override fun formRecipientsList(characters: Mono<List<Character>>): Mono<List<List<Recipient>>> {
         return characters.filterSaveCharacters()
-            .map { it.map(Character::toMailRecipient) + getCeo() }
+            .flatMapMany { Flux.fromIterable(it.map(Character::toMailRecipient).chunked(maxRecipients)) }
+            .map { it + getCeo() }
+            .collectList()
     }
 
     private fun Mono<List<Character>>.filterSaveCharacters(): Mono<List<Character>> {
@@ -52,4 +55,8 @@ class FormMailListsUseCaseImpl(
     }
 
     private fun getCeo(): Recipient = Recipient(recipientId = ceoId.toInt(), recipientType = RecipientType.CHARACTER)
+
+    companion object {
+        private const val maxRecipients = 49
+    }
 }

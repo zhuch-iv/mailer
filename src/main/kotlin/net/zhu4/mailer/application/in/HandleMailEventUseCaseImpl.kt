@@ -34,27 +34,44 @@ class HandleMailEventUseCaseImpl(
             .log(HandleMailEventUseCaseImpl::class.qualifiedName, Level.FINEST)
     }
 
-    private fun Mono<Tuple2<User, List<Recipient>>>.createAndSendMail(): Mono<List<Int>> {
-        return Mono.zip(
-            templatePersistencePort.findByName(templateName),
-            templatePersistencePort.findByName(subjectTemplateName),
-            this
-        ).flatMapMany { tuple ->
-            val user = tuple.t3.t1
-            Flux.fromIterable(tuple.t3.t2.chunked(maxRecipients))
-                .zipWith(getAccessToken.getAccessToken(user.discordId))
-                .flatMap {
-                    esiPort.sendMail(SendMailRequest(
-                        from = user.character!!.id,
-                        token = it.t2,
-                        mail = createMail(tuple.t2.template, tuple.t1.template, it.t1)
-                    ))
-                }
-        }
+    private fun Mono<Tuple2<User, List<List<Recipient>>>>.createAndSendMail(): Mono<List<Int>> {
+        return this.getAccessToken()
+            .buildRequest()
+            .flatMapMany { Flux.fromIterable(it) }
+            .flatMap { esiPort.sendMail(it) }
             .collectList()
     }
 
-    private fun Optional<ApplicationCommandInteraction>.formRecipientsList(): Mono<List<Recipient>> {
+    private fun Mono<Tuple2<User, List<List<Recipient>>>>.getAccessToken(): Mono<List<SendMailRequest.Builder>> {
+        return this.flatMap { tuple ->
+            getAccessToken.getAccessToken(tuple.t1.discordId)
+                .map { token ->
+                    tuple.t2.map {
+                        SendMailRequest.Builder()
+                            .token(token)
+                            .recipients(it)
+                            .from(tuple.t1.character!!.id)
+                    }
+                }
+        }
+    }
+
+    private fun Mono<List<SendMailRequest.Builder>>.buildRequest(): Mono<List<SendMailRequest>> {
+        return this.flatMap {
+            Mono.zip(
+                templatePersistencePort.findByName(templateName),
+                templatePersistencePort.findByName(subjectTemplateName),
+            ).map { templates ->
+                it.map {
+                    it.body(templates.t1.template)
+                        .subject(templates.t2.template)
+                        .build()
+                }
+            }
+        }
+    }
+
+    private fun Optional<ApplicationCommandInteraction>.formRecipientsList(): Mono<List<List<Recipient>>> {
         return formRecipientsList.formRecipientsList(
             this.flatMap { it.resolved }
                 .map { useCase.getCharacters(it.attachments.values) }
@@ -79,16 +96,7 @@ class HandleMailEventUseCaseImpl(
         return userPersistencePort.findByDiscordId(this)
     }
 
-    private fun createMail(subject: String, template: String, recipients: List<Recipient>): Mail {
-        return Mail(
-            body = template,
-            subject = subject,
-            recipients = recipients
-        )
-    }
-
     companion object {
-        private const val maxRecipients = 50
         private const val templateName = "mail"
         private const val subjectTemplateName = "subject"
     }
