@@ -85,6 +85,6 @@ class GetCharactersFromAttachmentsUseCaseImpl(
     }
 
     companion object {
-        private const val expectedContentType = "text/plain"
+        private const val expectedContentType = "text/plain; charset=utf-8"
     }
 }
