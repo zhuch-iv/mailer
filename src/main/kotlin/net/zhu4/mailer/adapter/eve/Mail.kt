@@ -35,6 +35,7 @@ data class MailHeader(
     val timestamp: LocalDateTime
 )
 
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class Recipient(
     val recipientId: Int,
     val recipientType: RecipientType

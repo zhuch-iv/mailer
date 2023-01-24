@@ -52,7 +52,7 @@ class EsiAdapter(
         return webClient.post()
             .uri("/characters/${request.from}/mail/")
             .header(HttpHeaders.AUTHORIZATION, "Bearer ${request.token}")
-            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(request.mail.fromDomain())
             .retrieve()
             .onStatus(HttpStatusCode::is4xxClientError, this::wrapClientError)

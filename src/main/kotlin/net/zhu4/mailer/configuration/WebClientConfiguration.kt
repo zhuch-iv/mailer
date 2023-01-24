@@ -1,15 +1,12 @@
 package net.zhu4.mailer.configuration
 
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.web.reactive.function.client.ExchangeFilterFunction
 import org.springframework.web.reactive.function.client.WebClient
-import reactor.core.publisher.Mono
 import java.util.*
 
 @Configuration
@@ -30,7 +27,6 @@ class WebClientConfiguration {
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.CACHE_CONTROL, "no-cache")
                 .defaultUriVariables(mapOf("datasource" to "tranquility"))
-                .filter(logRequest())
                 .build()
     }
 
@@ -42,18 +38,5 @@ class WebClientConfiguration {
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader(HttpHeaders.CACHE_CONTROL, "no-cache")
             .build()
-    }
-
-    fun logRequest(): ExchangeFilterFunction {
-        return ExchangeFilterFunction.ofRequestProcessor {
-            if (log.isInfoEnabled) {
-                log.debug("Request: ${it.body()}")
-            }
-            Mono.just(it)
-        }
-    }
-
-    companion object {
-        private val log = LoggerFactory.getLogger(WebClientConfiguration::class.java)
     }
 }

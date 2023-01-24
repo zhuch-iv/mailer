@@ -30,8 +30,8 @@ class HandleMailEventUseCaseImpl(
             event.interaction.commandInteraction.formRecipientsList()
         )
             .createAndSendMail()
+            .replyToUser(event)
             .log(HandleMailEventUseCaseImpl::class.qualifiedName, Level.FINEST)
-            .then()
     }
 
     private fun Mono<Tuple2<User, List<Recipient>>>.createAndSendMail(): Mono<List<Int>> {
@@ -42,17 +42,14 @@ class HandleMailEventUseCaseImpl(
         ).flatMapMany { tuple ->
             val user = tuple.t3.t1
             Flux.fromIterable(tuple.t3.t2.chunked(maxRecipients))
-                .flatMap { recipients ->
-                    getAccessToken.getAccessToken(user.discordId)
-                        .map {
-                            SendMailRequest(
-                                from = user.character!!.id,
-                                token = it,
-                                mail = createMail(tuple.t2.template, tuple.t1.template, recipients)
-                            )
-                        }
+                .zipWith(getAccessToken.getAccessToken(user.discordId))
+                .flatMap {
+                    esiPort.sendMail(SendMailRequest(
+                        from = user.character!!.id,
+                        token = it.t2,
+                        mail = createMail(tuple.t2.template, tuple.t1.template, it.t1)
+                    ))
                 }
-                .flatMap { esiPort.sendMail(it) }
         }
             .collectList()
     }
@@ -63,6 +60,19 @@ class HandleMailEventUseCaseImpl(
                 .map { useCase.getCharacters(it.attachments.values) }
                 .orElse(Mono.empty())
         )
+    }
+
+    private fun Mono<List<Int>>.replyToUser(event: ChatInputInteractionEvent): Mono<Void> {
+        return this
+            .switchIfEmpty(Mono.just(emptyList()))
+            .flatMap {
+                if (it.isNotEmpty()) {
+                    event.editReply("Successfully sent to ${it.size} characters")
+                } else {
+                    event.editReply("Nothing to do")
+                }
+            }
+            .then()
     }
 
     private fun Long.getBotUser(): Mono<User> {

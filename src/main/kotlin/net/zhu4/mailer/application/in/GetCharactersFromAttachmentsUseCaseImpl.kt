@@ -24,6 +24,7 @@ class GetCharactersFromAttachmentsUseCaseImpl(
             .getIdsByNames()
             .filterNonMailedCharacters()
             .getCharacters()
+            .filter { it.isNotEmpty() }
     }
 
     private fun Mono<List<Int>>.getCharacters(): Mono<List<Character>> {

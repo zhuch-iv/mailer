@@ -77,8 +77,7 @@ class EveOauthAdapter(
         return verifyAccessToken(auth)
             .map { auth }
             .switchIfEmpty {
-                verifyRefreshToken(auth)
-                    .flatMap { refreshEveAuthorization(auth.refreshToken) }
+                refreshEveAuthorization(auth.refreshToken)
             }
             .switchIfEmpty(Mono.error(UserNotAuthorizedException("There are no valid tokens")))
     }
@@ -89,7 +88,7 @@ class EveOauthAdapter(
                 try {
                     it.processToClaims(auth.accessToken).subject.parseSubjectId()
                 } catch (e: InvalidJwtException) {
-                    log.error("Invalid access token:", e)
+                    log.debug("Invalid access token:", e)
                     0
                 }
             }
@@ -97,6 +96,7 @@ class EveOauthAdapter(
     }
 
     override fun verifyRefreshToken(auth: EveAuthorization): Mono<Int> {
+        // TODO: rewrite
         return jwtConsumer()
             .map {
                 try {
@@ -119,6 +119,7 @@ class EveOauthAdapter(
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .header(HttpHeaders.HOST, "login.eveonline.com")
             .header(HttpHeaders.AUTHORIZATION, "Basic $encoded")
+            .body(BodyInserters.fromFormData(formData))
             .retrieve()
             .onStatus(HttpStatusCode::is4xxClientError, this::wrapClientError)
             .onStatus(HttpStatusCode::is5xxServerError, this::wrapServerError)
