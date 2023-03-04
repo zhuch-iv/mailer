@@ -10,7 +10,7 @@ import io.mongock.driver.mongodb.reactive.util.MongoSubscriberSync
 import io.mongock.driver.mongodb.reactive.util.SubscriberSync
 import net.zhu4.mailer.domain.Template
 
-@ChangeUnit(id = "update-mail-template", order = "4", author = "zhuch")
+@ChangeUnit(id = "update-mail-template", order = "6", author = "zhuch")
 class UpdateMailTemplate {
 
     @BeforeExecution
