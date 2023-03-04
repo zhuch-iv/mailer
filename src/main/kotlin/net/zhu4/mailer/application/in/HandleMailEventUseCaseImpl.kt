@@ -28,10 +28,11 @@ class HandleMailEventUseCaseImpl(
         return Mono.zip(
             event.interaction.user.id.asLong().getBotUser(),
             event.interaction.commandInteraction.formRecipientsList()
+                .log(HandleMailEventUseCaseImpl::class.qualifiedName, Level.INFO)
         )
+            .log(HandleMailEventUseCaseImpl::class.qualifiedName, Level.INFO)
             .createAndSendMail()
             .replyToUser(event)
-            .log(HandleMailEventUseCaseImpl::class.qualifiedName, Level.FINEST)
     }
 
     private fun Mono<Tuple2<User, List<List<Recipient>>>>.createAndSendMail(): Mono<List<Int>> {
